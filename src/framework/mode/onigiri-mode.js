@@ -18,8 +18,7 @@
             classPrefix: 'theme-',
             transitions: true,
             transitionDuration: 300,
-            
-            // Selectors for auto-detection
+
             selectors: {
                 root: 'html',
                 containers: '[data-theme-container]',
@@ -27,7 +26,6 @@
                 indicators: '[data-theme-indicator]'
             },
 
-            // Class name mappings
             classes: {
                 light: {
                     bg: 'bg-white',
@@ -43,7 +41,6 @@
                 }
             },
 
-            // Custom theme definitions
             themes: {
                 light: {},
                 dark: {}
@@ -60,24 +57,18 @@
         init: function(options) {
             Onigiri.extend(this._config, options || {});
 
-            // Load stored mode
             this._currentMode = this._loadMode();
 
-            // Setup system theme detection
             if (this._config.syncWithSystem) {
                 this._setupSystemSync();
             }
 
-            // Apply initial mode
             this.set(this._currentMode, false);
 
-            // Setup auto-detection for dynamic elements
             this._setupObservers();
 
-            // Bind toggle buttons
             this._bindToggles();
 
-            // Emit ready event
             document.dispatchEvent(new CustomEvent('onigiri:mode:ready', {
                 detail: { mode: this._currentMode }
             }));
@@ -103,39 +94,31 @@
             const oldMode = this._currentMode;
             this._currentMode = mode;
 
-            // Add transition class if enabled
             if (this._config.transitions) {
                 this._enableTransitions();
             }
 
-            // Apply to root element
             this._applyToElement(
                 document.querySelector(this._config.selectors.root),
                 mode
             );
 
-            // Apply to all containers
             this._applyToContainers(mode);
 
-            // Update toggle buttons
             this._updateToggles(mode);
 
-            // Update indicators
             this._updateIndicators(mode);
 
-            // Save to storage
             if (save && Onigiri.modules.storage) {
                 Onigiri.storage.set(this._config.storageKey, mode);
             }
 
-            // Remove transition class after animation
             if (this._config.transitions) {
                 setTimeout(() => {
                     this._disableTransitions();
                 }, this._config.transitionDuration);
             }
 
-            // Emit change event
             document.dispatchEvent(new CustomEvent('onigiri:mode:change', {
                 detail: { 
                     mode: mode, 
@@ -189,15 +172,15 @@
          */
         applyTo: function(element, mode) {
             mode = mode || this._currentMode;
-            
+
             if (typeof element === 'string') {
                 element = document.querySelector(element);
             }
-            
+
             if (element) {
                 this._applyToElement(element, mode);
             }
-            
+
             return this;
         },
 
@@ -205,13 +188,11 @@
          * Load mode from storage or system
          */
         _loadMode: function() {
-            // Try storage first
             if (Onigiri.modules.storage) {
                 const stored = Onigiri.storage.get(this._config.storageKey);
                 if (stored) return stored;
             }
 
-            // Auto-detect from system
             if (this._config.autoDetect && window.matchMedia) {
                 if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
                     return 'dark';
@@ -228,16 +209,14 @@
             if (!window.matchMedia) return;
 
             this._mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-            
+
             const handler = (e) => {
-                // Only sync if user hasn't manually set a preference
                 if (!Onigiri.modules.storage || 
                     !Onigiri.storage.has(this._config.storageKey)) {
                     this.set(e.matches ? 'dark' : 'light', false);
                 }
             };
 
-            // Modern browsers
             if (this._mediaQuery.addEventListener) {
                 this._mediaQuery.addEventListener('change', handler);
             } else {
@@ -251,18 +230,19 @@
         _applyToElement: function(el, mode) {
             if (!el) return;
 
-            // Set data attribute
             el.setAttribute(this._config.attribute, mode);
 
-            // Add/remove class prefix
             el.classList.remove(this._config.classPrefix + 'light');
             el.classList.remove(this._config.classPrefix + 'dark');
             el.classList.add(this._config.classPrefix + mode);
 
-            // Apply registered class swaps
+            if (el.tagName === 'HTML' || el.tagName === 'BODY') {
+                el.classList.remove('light-mode', 'dark-mode');
+                el.classList.add(mode + '-mode');
+            }
+
             this._swapClasses(el, mode);
 
-            // Apply custom theme if defined
             if (this._config.themes[mode]) {
                 this._applyCustomTheme(el, this._config.themes[mode]);
             }
@@ -275,7 +255,7 @@
             const containers = document.querySelectorAll(
                 this._config.selectors.containers
             );
-            
+
             containers.forEach(el => {
                 this._applyToElement(el, mode);
             });
@@ -289,21 +269,18 @@
             const addClasses = this._config.classes[mode];
             const removeClasses = this._config.classes[oppositeMode];
 
-            // Remove opposite mode classes
             Object.values(removeClasses).forEach(className => {
                 if (el.classList.contains(className)) {
                     el.classList.remove(className);
                 }
             });
 
-            // Add current mode classes
             Object.values(addClasses).forEach(className => {
                 if (!el.classList.contains(className)) {
                     el.classList.add(className);
                 }
             });
 
-            // Process child elements with specific class patterns
             this._processChildElements(el, mode);
         },
 
@@ -312,7 +289,7 @@
          */
         _processChildElements: function(parent, mode) {
             const elements = parent.querySelectorAll('[class*="bg-"], [class*="text-"], [class*="border-"]');
-            
+
             elements.forEach(el => {
                 this._swapElementClasses(el, mode);
             });
@@ -326,7 +303,6 @@
             const oppositeMode = mode === 'light' ? 'dark' : 'light';
 
             classList.forEach(className => {
-                // Match patterns like: bg-white, bg-gray-900, text-gray-800, etc.
                 if (this._shouldSwapClass(className, oppositeMode)) {
                     const newClass = this._getSwappedClass(className, mode);
                     if (newClass && newClass !== className) {
@@ -341,7 +317,6 @@
          * Check if class should be swapped
          */
         _shouldSwapClass: function(className, currentMode) {
-            // Patterns that indicate theme-specific classes
             const patterns = [
                 /^bg-(white|black|gray-[0-9]+)$/,
                 /^text-(white|black|gray-[0-9]+)$/,
@@ -355,7 +330,6 @@
          * Get swapped class for mode
          */
         _getSwappedClass: function(className, targetMode) {
-            // Simple mapping logic - can be extended
             const mappings = {
                 light: {
                     'bg-gray-900': 'bg-white',
@@ -396,7 +370,7 @@
          */
         _bindToggles: function() {
             const toggles = document.querySelectorAll(this._config.selectors.toggle);
-            
+
             toggles.forEach(toggle => {
                 toggle.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -410,11 +384,10 @@
          */
         _updateToggles: function(mode) {
             const toggles = document.querySelectorAll(this._config.selectors.toggle);
-            
+
             toggles.forEach(toggle => {
                 toggle.setAttribute('data-current-theme', mode);
-                
-                // Update aria label for accessibility
+
                 toggle.setAttribute('aria-label', 
                     `Switch to ${mode === 'light' ? 'dark' : 'light'} mode`
                 );
@@ -428,7 +401,7 @@
             const indicators = document.querySelectorAll(
                 this._config.selectors.indicators
             );
-            
+
             indicators.forEach(indicator => {
                 indicator.textContent = mode;
                 indicator.setAttribute('data-theme', mode);
@@ -444,13 +417,11 @@
             const observer = new MutationObserver((mutations) => {
                 mutations.forEach(mutation => {
                     mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === 1) { // Element node
-                            // Check if it's a container
+                        if (node.nodeType === 1) {
                             if (node.matches && node.matches(this._config.selectors.containers)) {
                                 this._applyToElement(node, this._currentMode);
                             }
-                            
-                            // Check for toggles
+
                             if (node.matches && node.matches(this._config.selectors.toggle)) {
                                 node.addEventListener('click', (e) => {
                                     e.preventDefault();
@@ -498,7 +469,7 @@
         destroy: function() {
             this._observers.forEach(observer => observer.disconnect());
             this._observers = [];
-            
+
             if (this._mediaQuery && this._mediaQuery.removeEventListener) {
                 this._mediaQuery.removeEventListener('change', () => {});
             }
