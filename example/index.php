@@ -174,10 +174,10 @@ function csrf_token() {
     <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/events/onigiri-events.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/components/onigiri-components.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/security/onigiri-security.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/ajax/onigiri.ajax.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/ajax/onigiri-ajax.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/storage/onigiri-storage.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/validation/onigiri.validation.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/animate/onigiri.animate.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/validation/onigiri-validation.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/animate/onigiri-animate.js"></script>
 
     <script src="static/js/demo.js"></script>
 </body>
