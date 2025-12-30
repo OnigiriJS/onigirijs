@@ -1,8 +1,34 @@
 <?php
 
+/*
+ * ===============================================================
+ *      ____        _       _      _      _  _____ 
+ *     / __ \      (_)     (_)    (_)    | |/ ____|
+ *    | |  | |_ __  _  __ _ _ _ __ _     | | (___  
+ *    | |  | | '_ \| |/ _` | | '__| |_   | |\___ \ 
+ *    | |__| | | | | | (_| | | |  | | |__| |____) |
+ *     \____/|_| |_|_|\__, |_|_|  |_|\____/|_____/ 
+ *                     __/ |                       
+ *                    |___/                        
+ * ===============================================================
+ *
+ *   Lightweight, deliciously simple, modular JavaScript framework for building reactive HumHub modules with enterprise-grade security
+ *
+ *   Website:   https://onigirijs.greenmeteor.net/
+ *   License:   BSD-3-Clause
+ *
+ *   Copyright (c) 2025 Green Meteor
+ *
+ *   Redistribution and use in source and binary forms, with or
+ *   without modification, are permitted provided that the
+ *   conditions of the BSD 3-Clause License are met.
+ *
+ *   SPDX-License-Identifier: BSD-3-Clause
+ * ===============================================================
+ */
+
 session_start();
 
-// Generate CSRF token
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -10,6 +36,7 @@ if (empty($_SESSION['csrf_token'])) {
 function csrf_token() {
     return $_SESSION['csrf_token'];
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,7 +63,7 @@ function csrf_token() {
 
         <div id="shop-section" class="demo-section active">
             <h2>🍙 Onigiri Shop (Full-Featured Demo)</h2>
-            
+
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
                 <div>
                     <div id="menu-container" class="menu-grid">
@@ -59,7 +86,7 @@ function csrf_token() {
 
         <div id="form-section" class="demo-section">
             <h2>📝 Contact Form (Validation Demo)</h2>
-            
+
             <form id="contact-form">
                 <div class="form-group">
                     <label for="name">Name *</label>
@@ -91,7 +118,7 @@ function csrf_token() {
 
         <div id="components-section" class="demo-section">
             <h2>📦 Reactive Components Demo</h2>
-            
+
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-value" id="counter-value">0</div>
