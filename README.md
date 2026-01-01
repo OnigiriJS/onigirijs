@@ -38,12 +38,12 @@ You can include individual modules as needed.
 <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/events/onigiri-events.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/components/onigiri-components.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/security/onigiri-security.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/ajax/onigiri.ajax.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/ajax/onigiri-ajax.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/storage/onigiri-storage.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/validation/onigiri.validation.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/animate/onigiri.animate.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/pjax/onigiri.pjax.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/humhub/onigiri.humhub.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/validation/onigiri-validation.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/animate/onigiri-animate.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/pjax/onigiri-pjax.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/humhub/onigiri-humhub.js"></script>
 ```
 
 > ℹ️ Load order matters — always load `onigiri-core.js` first.
