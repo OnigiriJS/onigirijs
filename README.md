@@ -38,12 +38,14 @@ You can include individual modules as needed.
 <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/events/onigiri-events.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/components/onigiri-components.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/security/onigiri-security.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/ajax/onigiri.ajax.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/ajax/onigiri-ajax.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/storage/onigiri-storage.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/validation/onigiri.validation.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/animate/onigiri.animate.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/pjax/onigiri.pjax.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/humhub/onigiri.humhub.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/validation/onigiri-validation.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/animate/onigiri-animate.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/pjax/onigiri-pjax.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/humhub/onigiri-humhub.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/plugins/onigiri-plugins.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/emojis/onigiri-emojis.js"></script>
 ```
 
 > ℹ️ Load order matters — always load `onigiri-core.js` first.
@@ -59,7 +61,7 @@ A full demos showcasing components, animations, storage, security, and validatio
 - [ ] 📦 npm package (?)
 - [ ] 🧪 Test suite
 - [x] 📘 API reference docs
-- [ ] 🔌 Plugin system
+- [x] 🔌 Plugin system
 - [ ] ⚡ Performance optimizations
 
 ## 🤝 Contributing
@@ -72,7 +74,7 @@ Contributions, bug reports, and feature requests are welcome.
 
 ## 📄 License
 
-BSD-3-Clause license © OnigiriJS
+BSD-3-Clause license © OnigiriJS Framework
 
 ___
 
