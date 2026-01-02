@@ -46,6 +46,8 @@ You can include individual modules as needed.
 <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/humhub/onigiri-humhub.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/plugins/onigiri-plugins.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/emojis/onigiri-emojis.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/portal/onigiri-portal.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/router/onigiri-router.js"></script>
 ```
 
 > ℹ️ Load order matters — always load `onigiri-core.js` first.
