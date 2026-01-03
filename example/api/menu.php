@@ -30,13 +30,65 @@
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
-$menu = [
-    ['id' => 1, 'name' => 'Salmon Onigiri', 'description' => 'Fresh salmon with seasoned rice', 'price' => 3.50, 'emoji' => '🐟'],
-    ['id' => 2, 'name' => 'Tuna Onigiri', 'description' => 'Spicy tuna with mayo', 'price' => 3.50, 'emoji' => '🐠'],
-    ['id' => 3, 'name' => 'Umeboshi Onigiri', 'description' => 'Pickled plum, classic taste', 'price' => 3.00, 'emoji' => '🌸'],
-    ['id' => 4, 'name' => 'Chicken Teriyaki', 'description' => 'Grilled chicken with teriyaki sauce', 'price' => 4.00, 'emoji' => '🍗'],
-    ['id' => 5, 'name' => 'Vegetable Onigiri', 'description' => 'Fresh vegetables and herbs', 'price' => 3.25, 'emoji' => '🥬'],
-    ['id' => 6, 'name' => 'Shrimp Tempura', 'description' => 'Crispy tempura shrimp', 'price' => 4.50, 'emoji' => '🍤']
-];
+try {
+    $locale = $_GET['locale'] ?? $_SESSION['locale'] ?? 'en';
+    $_SESSION['locale'] = $locale;
 
-echo json_encode($menu);
+    $menu = [
+        [
+            'id' => 1, 
+            'nameKey' => 'menu.salmon.name',
+            'descKey' => 'menu.salmon.desc',
+            'price' => 3.50, 
+            'emoji' => '🐟'
+        ],
+        [
+            'id' => 2, 
+            'nameKey' => 'menu.tuna.name',
+            'descKey' => 'menu.tuna.desc',
+            'price' => 3.50, 
+            'emoji' => '🐠'
+        ],
+        [
+            'id' => 3, 
+            'nameKey' => 'menu.umeboshi.name',
+            'descKey' => 'menu.umeboshi.desc',
+            'price' => 3.00, 
+            'emoji' => '🌸'
+        ],
+        [
+            'id' => 4, 
+            'nameKey' => 'menu.chicken.name',
+            'descKey' => 'menu.chicken.desc',
+            'price' => 4.00, 
+            'emoji' => '🍗'
+        ],
+        [
+            'id' => 5, 
+            'nameKey' => 'menu.vegetable.name',
+            'descKey' => 'menu.vegetable.desc',
+            'price' => 3.25, 
+            'emoji' => '🥬'
+        ],
+        [
+            'id' => 6, 
+            'nameKey' => 'menu.shrimp.name',
+            'descKey' => 'menu.shrimp.desc',
+            'price' => 4.50, 
+            'emoji' => '🍤'
+        ]
+    ];
+
+    echo json_encode([
+        'menu' => $menu,
+        'locale' => $locale,
+        'success' => true
+    ]);
+
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => 'Server error',
+        'message' => $e->getMessage()
+    ]);
+}
