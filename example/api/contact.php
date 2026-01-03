@@ -26,9 +26,43 @@
  *   SPDX-License-Identifier: BSD-3-Clause
  * ===============================================================
  */
-session_start();
 
 header('Content-Type: application/json');
+
+$locale = $_SESSION['locale'] ?? 'en';
+
+$messages = [
+    'en' => [
+        'csrf_error' => 'CSRF token mismatch',
+        'required_fields' => 'Required fields missing',
+        'invalid_email' => 'Invalid email address',
+        'method_not_allowed' => 'Method not allowed',
+        'success' => 'Thank you for your message! 🍙'
+    ],
+    'es' => [
+        'csrf_error' => 'Token CSRF no coincide',
+        'required_fields' => 'Faltan campos obligatorios',
+        'invalid_email' => 'Dirección de correo electrónico no válida',
+        'method_not_allowed' => 'Método no permitido',
+        'success' => '¡Gracias por tu mensaje! 🍙'
+    ],
+    'fr' => [
+        'csrf_error' => 'Jeton CSRF incorrect',
+        'required_fields' => 'Champs obligatoires manquants',
+        'invalid_email' => 'Adresse e-mail invalide',
+        'method_not_allowed' => 'Méthode non autorisée',
+        'success' => 'Merci pour votre message! 🍙'
+    ],
+    'ja' => [
+        'csrf_error' => 'CSRFトークンが一致しません',
+        'required_fields' => '必須フィールドがありません',
+        'invalid_email' => '無効なメールアドレス',
+        'method_not_allowed' => 'メソッドは許可されていません',
+        'success' => 'メッセージありがとうございます！🍙'
+    ]
+];
+
+$msg = $messages[$locale] ?? $messages['en'];
 
 function verifyCsrf() {
     $token = $_POST['_csrf'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
@@ -38,7 +72,7 @@ function verifyCsrf() {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verifyCsrf()) {
         http_response_code(403);
-        echo json_encode(['error' => 'CSRF token mismatch']);
+        echo json_encode(['error' => $msg['csrf_error']]);
         exit;
     }
 
@@ -49,24 +83,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($name) || empty($email) || empty($message)) {
         http_response_code(400);
-        echo json_encode(['error' => 'Required fields missing']);
+        echo json_encode(['error' => $msg['required_fields']]);
         exit;
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         http_response_code(400);
-        echo json_encode(['error' => 'Invalid email']);
+        echo json_encode(['error' => $msg['invalid_email']]);
         exit;
     }
 
-    // Here you would normally send email, save to database, etc.
-    // For demo, just return success
-
     echo json_encode([
         'success' => true,
-        'message' => 'Thank you for your message! 🍙'
+        'message' => $msg['success']
     ]);
 } else {
     http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
+    echo json_encode(['error' => $msg['method_not_allowed']]);
 }
