@@ -4,7 +4,7 @@
 
 It provides a modern, dependency-free alternative to heavy frameworks while remaining flexible enough for real-world applications.
 
-🌐 Demo & Docs: https://onigirijs.greenmeteor.net/
+🌐 Demo & Docs: https://onigirijs.com/
 
 ## ✨ Features
 
@@ -56,7 +56,7 @@ You can include individual modules as needed.
 
 A full demos showcasing components, animations, storage, security, and validation is available at:
 
-👉 [OnigiriJS Shop Demo](https://onigirijs.greenmeteor.net/shop/)
+👉 [OnigiriJS Shop Demo](https://onigirijs.com/shop/)
 
 ## 🛣 Roadmap
 
