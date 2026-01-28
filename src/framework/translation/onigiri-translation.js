@@ -358,6 +358,226 @@
         getTranslations: function(locale) {
             locale = locale || this._config.locale;
             return this._translations[locale] || {};
+        },
+
+        /**
+         * Export translations to JSON format
+         */
+        exportJSON: function(locale, namespace) {
+            locale = locale || this._config.locale;
+            const translations = namespace ? 
+                this._translations[locale]?.[namespace] : 
+                this._translations[locale];
+
+            if (!translations) {
+                console.warn(`OnigiriJS i18n: No translations found for locale "${locale}"${namespace ? ` and namespace "${namespace}"` : ''}`);
+                return null;
+            }
+
+            return JSON.stringify(translations, null, 2);
+        },
+
+        /**
+         * Export translations to PHP format
+         */
+        exportPHP: function(locale, namespace) {
+            locale = locale || this._config.locale;
+            const translations = namespace ? 
+                this._translations[locale]?.[namespace] : 
+                this._translations[locale];
+
+            if (!translations) {
+                console.warn(`OnigiriJS i18n: No translations found for locale "${locale}"${namespace ? ` and namespace "${namespace}"` : ''}`);
+                return null;
+            }
+
+            return this._generatePHPArray(translations);
+        },
+
+        /**
+         * Generate PHP array syntax from object
+         */
+        _generatePHPArray: function(obj, indent) {
+            indent = indent || 0;
+            const spaces = '    '.repeat(indent);
+            const innerSpaces = '    '.repeat(indent + 1);
+            
+            let php = '[\n';
+            
+            Object.keys(obj).forEach(key => {
+                const value = obj[key];
+                const phpKey = `'${key.replace(/'/g, "\\'")}'`;
+                
+                if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                    php += `${innerSpaces}${phpKey} => ${this._generatePHPArray(value, indent + 1)},\n`;
+                } else if (typeof value === 'string') {
+                    const phpValue = `'${value.replace(/'/g, "\\'").replace(/\n/g, "\\n")}'`;
+                    php += `${innerSpaces}${phpKey} => ${phpValue},\n`;
+                } else {
+                    php += `${innerSpaces}${phpKey} => ${value},\n`;
+                }
+            });
+            
+            php += `${spaces}]`;
+            return php;
+        },
+
+        /**
+         * Import translations from JSON
+         */
+        importJSON: function(jsonString, locale, namespace) {
+            try {
+                const translations = JSON.parse(jsonString);
+                this.addTranslations(locale, translations, namespace);
+                return true;
+            } catch (e) {
+                console.error('OnigiriJS i18n: Failed to import JSON translations', e);
+                return false;
+            }
+        },
+
+        /**
+         * Import translations from PHP array string
+         */
+        importPHP: function(phpString, locale, namespace) {
+            try {
+                // Extract the array content from PHP string
+                const arrayMatch = phpString.match(/\[[\s\S]*\]/);
+                if (!arrayMatch) {
+                    throw new Error('Invalid PHP array format');
+                }
+
+                // Convert PHP array to JSON-compatible string
+                let jsonString = arrayMatch[0]
+                    .replace(/=>/g, ':')
+                    .replace(/'/g, '"');
+
+                const translations = JSON.parse(jsonString);
+                this.addTranslations(locale, translations, namespace);
+                return true;
+            } catch (e) {
+                console.error('OnigiriJS i18n: Failed to import PHP translations', e);
+                return false;
+            }
+        },
+
+        /**
+         * Download translation file
+         */
+        downloadTranslation: function(locale, label, format) {
+            locale = locale || this._config.locale;
+            label = label || 'messages';
+            format = format || 'json';
+
+            const namespace = label !== 'messages' ? label : null;
+            let content, mimeType, extension;
+
+            if (format === 'json') {
+                content = this.exportJSON(locale, namespace);
+                mimeType = 'application/json';
+                extension = 'json';
+            } else if (format === 'php') {
+                content = this.exportPHP(locale, namespace);
+                if (content) {
+                    content = `<?php\n\nreturn ${content};\n`;
+                }
+                mimeType = 'application/x-php';
+                extension = 'php';
+            } else {
+                console.error('OnigiriJS i18n: Unsupported format. Use "json" or "php".');
+                return false;
+            }
+
+            if (!content) {
+                return false;
+            }
+
+            // Create download
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const filename = `${label}.${extension}`;
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            console.log(`OnigiriJS i18n: Downloaded translation/${locale}/${filename}`);
+            return true;
+        },
+
+        /**
+         * Load translation file from URL
+         */
+        loadTranslation: function(url, locale, namespace) {
+            return fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(content => {
+                    const format = url.endsWith('.php') ? 'php' : 'json';
+                    
+                    if (format === 'php') {
+                        return this.importPHP(content, locale, namespace);
+                    } else {
+                        return this.importJSON(content, locale, namespace);
+                    }
+                })
+                .then(success => {
+                    if (success) {
+                        console.log(`OnigiriJS i18n: Loaded translations from ${url}`);
+                        document.dispatchEvent(new CustomEvent('onigiri:translations:loaded', {
+                            detail: { url, locale, namespace }
+                        }));
+                    }
+                    return success;
+                })
+                .catch(error => {
+                    console.error(`OnigiriJS i18n: Failed to load translations from ${url}`, error);
+                    return false;
+                });
+        },
+
+        /**
+         * Load translations with the /translation/{language}/{label}.{format} structure
+         */
+        loadFromPath: function(basePath, locale, label, format) {
+            basePath = basePath || '/translation';
+            locale = locale || this._config.locale;
+            label = label || 'messages';
+            format = format || 'json';
+
+            const url = `${basePath}/${locale}/${label}.${format}`;
+            const namespace = label !== 'messages' ? label : null;
+
+            return this.loadTranslation(url, locale, namespace);
+        },
+
+        /**
+         * Batch load multiple translation files
+         */
+        loadMultiple: function(basePath, locale, labels, format) {
+            locale = locale || this._config.locale;
+            labels = labels || ['messages'];
+            format = format || 'json';
+
+            const promises = labels.map(label => 
+                this.loadFromPath(basePath, locale, label, format)
+            );
+
+            return Promise.all(promises)
+                .then(results => {
+                    const successful = results.filter(r => r).length;
+                    console.log(`OnigiriJS i18n: Loaded ${successful}/${results.length} translation files`);
+                    return results;
+                });
         }
     };
 
