@@ -12,10 +12,10 @@
  *
  *   Lightweight, deliciously simple, modular JavaScript framework for building reactive HumHub modules with enterprise-grade security
  *
- *   Website:   https://onigirijs.greenmeteor.net/
+ *   Website:   https://onigirijs.com/
  *   License:   BSD-3-Clause
  *
- *   Copyright (c) 2025 Green Meteor
+ *   Copyright (c) 2025 OnigiriJS Framework
  *
  *   Redistribution and use in source and binary forms, with or
  *   without modification, are permitted provided that the
