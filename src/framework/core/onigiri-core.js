@@ -10,18 +10,14 @@
  *                    |___/                        
  * ===============================================================
  *
- *   Lightweight, deliciously simple, modular JavaScript framework for building reactive HumHub modules with enterprise-grade security
+ *   Lightweight, deliciously simple, modular JavaScript framework
+ *   for building reactive HumHub modules with enterprise-grade security
  *
  *   Website:   https://onigirijs.com/
  *   License:   BSD-3-Clause
  *
  *   Copyright (c) 2025 OnigiriJS Framework
  *
- *   Redistribution and use in source and binary forms, with or
- *   without modification, are permitted provided that the
- *   conditions of the BSD 3-Clause License are met.
- *
- *   SPDX-License-Identifier: BSD-3-Clause
  * ===============================================================
  */
 (function(global) {
@@ -34,10 +30,10 @@
         if (!(this instanceof Onigiri)) {
             return new Onigiri(selector, context);
         }
-        
+
         this.elements = [];
         this.context = context || document;
-        
+
         if (typeof selector === 'string') {
             this.elements = Array.from(this.context.querySelectorAll(selector));
         } else if (selector instanceof HTMLElement) {
@@ -45,7 +41,7 @@
         } else if (selector instanceof NodeList || Array.isArray(selector)) {
             this.elements = Array.from(selector);
         }
-        
+
         this.length = this.elements.length;
         return this;
     }
@@ -81,6 +77,7 @@
                 el.addEventListener(event, handler);
             }
         });
+
         return this;
     };
 
@@ -91,9 +88,14 @@
 
     Onigiri.prototype.trigger = function(event, data) {
         this.each(el => {
-            const evt = new CustomEvent(event, { detail: data, bubbles: true });
+            const evt = new CustomEvent(event, {
+                detail: data,
+                bubbles: true
+            });
+
             el.dispatchEvent(evt);
         });
+
         return this;
     };
 
@@ -113,13 +115,18 @@
     };
 
     Onigiri.prototype.hasClass = function(className) {
-        return this.elements[0] ? this.elements[0].classList.contains(className) : false;
+        return this.elements[0]
+            ? this.elements[0].classList.contains(className)
+            : false;
     };
 
     Onigiri.prototype.attr = function(name, value) {
         if (value === undefined) {
-            return this.elements[0] ? this.elements[0].getAttribute(name) : null;
+            return this.elements[0]
+                ? this.elements[0].getAttribute(name)
+                : null;
         }
+
         this.each(el => el.setAttribute(name, value));
         return this;
     };
@@ -131,59 +138,93 @@
 
     Onigiri.prototype.data = function(key, value) {
         if (value === undefined) {
-            return this.elements[0] ? this.elements[0].dataset[key] : null;
+            return this.elements[0]
+                ? this.elements[0].dataset[key]
+                : null;
         }
-        this.each(el => el.dataset[key] = value);
+
+        this.each(el => {
+            el.dataset[key] = value;
+        });
+
         return this;
     };
 
     Onigiri.prototype.html = function(content) {
         if (content === undefined) {
-            return this.elements[0] ? this.elements[0].innerHTML : null;
+            return this.elements[0]
+                ? this.elements[0].innerHTML
+                : null;
         }
-        this.each(el => el.innerHTML = content);
+
+        this.each(el => {
+            el.innerHTML = content;
+        });
+
         return this;
     };
 
     Onigiri.prototype.text = function(content) {
         if (content === undefined) {
-            return this.elements[0] ? this.elements[0].textContent : null;
+            return this.elements[0]
+                ? this.elements[0].textContent
+                : null;
         }
-        this.each(el => el.textContent = content);
+
+        this.each(el => {
+            el.textContent = content;
+        });
+
         return this;
     };
 
     Onigiri.prototype.val = function(value) {
         if (value === undefined) {
-            return this.elements[0] ? this.elements[0].value : null;
+            return this.elements[0]
+                ? this.elements[0].value
+                : null;
         }
-        this.each(el => el.value = value);
+
+        this.each(el => {
+            el.value = value;
+        });
+
         return this;
     };
 
     Onigiri.prototype.css = function(prop, value) {
-        if (typeof prop === 'object') {
+        if (typeof prop === 'object' && prop !== null) {
             this.each(el => {
                 Object.keys(prop).forEach(key => {
                     el.style[key] = prop[key];
                 });
             });
         } else if (value === undefined) {
-            return this.elements[0] ? 
-                window.getComputedStyle(this.elements[0])[prop] : null;
+            return this.elements[0]
+                ? window.getComputedStyle(this.elements[0])[prop]
+                : null;
         } else {
-            this.each(el => el.style[prop] = value);
+            this.each(el => {
+                el.style[prop] = value;
+            });
         }
+
         return this;
     };
 
     Onigiri.prototype.show = function() {
-        this.each(el => el.style.display = '');
+        this.each(el => {
+            el.style.display = '';
+        });
+
         return this;
     };
 
     Onigiri.prototype.hide = function() {
-        this.each(el => el.style.display = 'none');
+        this.each(el => {
+            el.style.display = 'none';
+        });
+
         return this;
     };
 
@@ -195,6 +236,7 @@
                 el.appendChild(content);
             }
         });
+
         return this;
     };
 
@@ -206,6 +248,7 @@
                 el.insertBefore(content, el.firstChild);
             }
         });
+
         return this;
     };
 
@@ -215,34 +258,55 @@
     };
 
     Onigiri.prototype.empty = function() {
-        this.each(el => el.innerHTML = '');
+        this.each(el => {
+            el.innerHTML = '';
+        });
+
         return this;
     };
 
     Onigiri.prototype.find = function(selector) {
         const found = [];
+
         this.each(el => {
             found.push(...el.querySelectorAll(selector));
         });
+
         return new Onigiri(found);
     };
 
     Onigiri.prototype.parent = function() {
-        const parents = this.elements.map(el => el.parentElement).filter(Boolean);
+        const parents = this.elements
+            .map(el => el.parentElement)
+            .filter(Boolean);
+
         return new Onigiri(parents);
     };
 
     Onigiri.prototype.children = function() {
         const children = [];
-        this.each(el => children.push(...el.children));
+
+        this.each(el => {
+            children.push(...el.children);
+        });
+
         return new Onigiri(children);
     };
 
     Onigiri.prototype.siblings = function() {
         const siblings = [];
+
         this.each(el => {
-            siblings.push(...Array.from(el.parentElement.children).filter(child => child !== el));
+            if (!el.parentElement) {
+                return;
+            }
+
+            siblings.push(
+                ...Array.from(el.parentElement.children)
+                    .filter(child => child !== el)
+            );
         });
+
         return new Onigiri(siblings);
     };
 
@@ -250,8 +314,16 @@
      * Utility Methods
      */
     Onigiri.extend = function(target, ...sources) {
+
+        // Ensure target is always a valid object
+        if (target == null || typeof target !== 'object') {
+            target = {};
+        }
+
         sources.forEach(source => {
-            if (!source) {
+
+            // Skip invalid sources
+            if (source == null || typeof source !== 'object') {
                 return;
             }
 
@@ -265,27 +337,38 @@
 
     Onigiri.debounce = function(func, wait) {
         let timeout;
+
         return function(...args) {
             clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(this, args), wait);
+
+            timeout = setTimeout(() => {
+                func.apply(this, args);
+            }, wait);
         };
     };
 
     Onigiri.throttle = function(func, limit) {
-        let inThrottle;
+        let inThrottle = false;
+
         return function(...args) {
             if (!inThrottle) {
                 func.apply(this, args);
+
                 inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
+
+                setTimeout(() => {
+                    inThrottle = false;
+                }, limit);
             }
         };
     };
 
     Onigiri.isArray = Array.isArray;
-    
+
     Onigiri.isObject = function(obj) {
-        return obj !== null && typeof obj === 'object' && !Array.isArray(obj);
+        return obj !== null
+            && typeof obj === 'object'
+            && !Array.isArray(obj);
     };
 
     Onigiri.isFunction = function(func) {
@@ -293,39 +376,73 @@
     };
 
     Onigiri.isEmpty = function(obj) {
-        if (obj == null) return true;
-        if (Array.isArray(obj) || typeof obj === 'string') return obj.length === 0;
-        return Object.keys(obj).length === 0;
+
+        if (obj == null) {
+            return true;
+        }
+
+        if (Array.isArray(obj) || typeof obj === 'string') {
+            return obj.length === 0;
+        }
+
+        if (typeof obj === 'object') {
+            return Object.keys(obj).length === 0;
+        }
+
+        return false;
     };
 
     Onigiri.clone = function(obj) {
-        return JSON.parse(JSON.stringify(obj));
+
+        if (obj == null) {
+            return obj;
+        }
+
+        try {
+            return JSON.parse(JSON.stringify(obj));
+        } catch (e) {
+            console.error('Onigiri.clone failed:', e);
+            return obj;
+        }
     };
 
     /**
      * Plugin System
      */
     Onigiri.plugins = {};
-    
+
     Onigiri.use = function(plugin, options) {
+
         if (typeof plugin === 'function') {
             plugin(Onigiri, options);
-        } else if (plugin && typeof plugin.install === 'function') {
+        } else if (
+            plugin &&
+            typeof plugin.install === 'function'
+        ) {
             plugin.install(Onigiri, options);
         }
+
         return Onigiri;
     };
 
-    // Export to global scope
+    /**
+     * Export to global scope
+     */
     global.Onigiri = Onigiri;
     global.O = Onigiri;
 
-    // AMD support
+    /**
+     * AMD support
+     */
     if (typeof define === 'function' && define.amd) {
-        define(function() { return Onigiri; });
+        define(function() {
+            return Onigiri;
+        });
     }
 
-    // CommonJS support
+    /**
+     * CommonJS support
+     */
     if (typeof module !== 'undefined' && module.exports) {
         module.exports = Onigiri;
     }
