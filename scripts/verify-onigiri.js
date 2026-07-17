@@ -48,7 +48,11 @@ const path = require('path');
 const ROOT = process.cwd();
 
 const FRAMEWORK_DIR =
-    path.join(ROOT, 'framework');
+    path.join(
+        ROOT,
+        'src',
+        'framework'
+    );
 
 const CORE_FILE =
     path.join(
