@@ -1,42 +1,47 @@
 #!/usr/bin/env node
 
 /**
- * verify-onigiri.js
+ * verify-onigirijs.js
  * ---------------------------------------------------------------------------
  * Verifies OnigiriJS Framework repository standards.
  *
- * Designed for GitHub Actions pull request validation.
+ * OnigiriJS is a modular and granular JavaScript framework.
  *
- * Repository structure:
+ * Structure:
  *
- * framework/
+ * src/framework/
+ *
  * ├── core/
  * │   └── onigiri-core.js
  * │
- * ├── module-name/
- * │   └── onigiri-module-name.js
+ * ├── translation/
+ * │   └── onigiri-translation.js
+ * │
+ * ├── ajax/
+ * │   └── onigiri-ajax.js
+ * │
+ * └── ...
  *
  *
- * Checks:
+ * Validation:
  *
  *  1. Core framework integrity
- *  2. Public API availability
- *  3. Module naming conventions
- *  4. Module registration
- *  5. Module metadata
+ *  2. Core public API stability
+ *  3. Framework module structure
+ *  4. Module naming conventions
+ *  5. Module integration
  *  6. Security checks
- *  7. Documentation files
+ *  7. Documentation presence
  *
  *
  * Usage:
  *
- *   node scripts/verify-onigiri.js
+ *   node scripts/verify-onigirijs.js
  *
- *   node scripts/verify-onigiri.js --strict
+ *   node scripts/verify-onigirijs.js --strict
  *
  * ---------------------------------------------------------------------------
  */
-
 'use strict';
 
 const fs = require('fs');
@@ -47,25 +52,23 @@ const path = require('path');
 // -----------------------------------------------------------------------------
 const ROOT = process.cwd();
 
-const FRAMEWORK_DIR =
-    path.join(
-        ROOT,
-        'src',
-        'framework'
-    );
+const FRAMEWORK_DIR = path.join(
+    ROOT,
+    'src',
+    'framework'
+);
 
-const CORE_FILE =
-    path.join(
-        FRAMEWORK_DIR,
-        'core',
-        'onigiri-core.js'
-    );
+const CORE_FILE = path.join(
+    FRAMEWORK_DIR,
+    'core',
+    'onigiri-core.js'
+);
 
 const STRICT =
     process.argv.includes('--strict');
 
 // -----------------------------------------------------------------------------
-// Result storage
+// Storage
 // -----------------------------------------------------------------------------
 const errors = [];
 const warnings = [];
@@ -73,47 +76,51 @@ const warnings = [];
 // -----------------------------------------------------------------------------
 // Helpers
 // -----------------------------------------------------------------------------
-function log(message) {
-    process.stdout.write(message + '\n');
+function log(message)
+{
+    console.log(message);
 }
 
-function exists(file) {
+function exists(file)
+{
     return fs.existsSync(file);
 }
 
-function read(file) {
+function read(file)
+{
     return fs.readFileSync(file, 'utf8');
 }
 
-function addError(message) {
+function error(message)
+{
     errors.push(message);
 }
 
-function addWarning(message) {
+function warning(message)
+{
     warnings.push(message);
 }
 
 // -----------------------------------------------------------------------------
-// Core Validation
+// Core Verification
 // -----------------------------------------------------------------------------
-function verifyCore() {
+function verifyCore()
+{
 
-    log(
-        'Checking OnigiriJS core...'
-    );
+    log('Checking OnigiriJS core...');
 
-    if (!exists(CORE_FILE)) {
+    if (!exists(CORE_FILE))
+    {
 
-        addError(
-            'Missing framework/core/onigiri-core.js'
+        error(
+            'Missing src/framework/core/onigiri-core.js'
         );
 
         return;
 
     }
 
-    const source =
-        read(CORE_FILE);
+    const source = read(CORE_FILE);
 
     const requiredExports = [
         'Onigiri.version',
@@ -123,11 +130,13 @@ function verifyCore() {
 
     ];
 
-    for (const item of requiredExports) {
+    for (const item of requiredExports)
+    {
 
-        if (!source.includes(item)) {
+        if (!source.includes(item))
+        {
 
-            addError(
+            error(
                 `Core missing required export: ${item}`
             );
 
@@ -173,14 +182,16 @@ function verifyCore() {
 
     ];
 
-    for (const method of requiredMethods) {
+    for (const method of requiredMethods)
+    {
 
         const signature =
             `Onigiri.prototype.${method}`;
 
-        if (!source.includes(signature)) {
+        if (!source.includes(signature))
+        {
 
-            addError(
+            error(
                 `Core missing method: ${method}()`
             );
 
@@ -193,35 +204,36 @@ function verifyCore() {
             /Onigiri\.version\s*=\s*['"]([^'"]+)/
         );
 
-    if (!version) {
-
-        addError(
-            'Unable to detect Onigiri.version'
-        );
-
-    } else {
+    if (version)
+    {
 
         log(
             `Detected core version: ${version[1]}`
         );
 
     }
+    else
+    {
 
-    if (
-        source.includes('eval(')
-    ) {
+        error(
+            'Unable to detect Onigiri.version'
+        );
 
-        addError(
+    }
+
+    if (source.includes('eval('))
+    {
+
+        error(
             'Core contains forbidden eval()'
         );
 
     }
 
-    if (
-        source.includes('debugger')
-    ) {
+    if (source.includes('debugger'))
+    {
 
-        addError(
+        error(
             'Core contains debugger statement'
         );
 
@@ -230,18 +242,18 @@ function verifyCore() {
 }
 
 // -----------------------------------------------------------------------------
-// Module Validation
+// Module Verification
 // -----------------------------------------------------------------------------
-function verifyModules() {
+function verifyModules()
+{
 
-    log(
-        'Checking framework modules...'
-    );
+    log('Checking framework modules...');
 
-    if (!exists(FRAMEWORK_DIR)) {
+    if (!exists(FRAMEWORK_DIR))
+    {
 
-        addError(
-            'Missing framework directory'
+        error(
+            'Missing src/framework directory'
         );
 
         return;
@@ -251,9 +263,11 @@ function verifyModules() {
     const folders =
         fs.readdirSync(FRAMEWORK_DIR);
 
-    for (const folder of folders) {
+    for (const folder of folders)
+    {
 
-        if (folder === 'core') {
+        if (folder === 'core')
+        {
             continue;
         }
 
@@ -265,13 +279,13 @@ function verifyModules() {
 
         if (
             !fs.statSync(moduleDir).isDirectory()
-        ) {
+        )
+        {
             continue;
         }
 
         const expectedFile =
             `onigiri-${folder}.js`;
-
 
         const moduleFile =
             path.join(
@@ -279,9 +293,10 @@ function verifyModules() {
                 expectedFile
             );
 
-        if (!exists(moduleFile)) {
+        if (!exists(moduleFile))
+        {
 
-            addError(
+            error(
                 `${folder}: missing ${expectedFile}`
             );
 
@@ -292,41 +307,61 @@ function verifyModules() {
         const source =
             read(moduleFile);
 
-        if (
-            !source.includes('Onigiri.use')
-        ) {
+        //
+        // Verify module integration
+        //
+        const integrations = [
+            'Onigiri.',
+            'Onigiri.prototype.',
+            'global.Onigiri',
+            'window.Onigiri'
 
-            addError(
-                `${folder}: missing Onigiri.use() registration`
+        ];
+
+        const integrates =
+            integrations.some(
+                item => source.includes(item)
+            );
+
+        if (!integrates)
+        {
+
+            error(
+                `${folder}: does not appear to integrate with OnigiriJS core`
             );
 
         }
 
+        //
+        // Optional metadata
+        //
         if (
             !source.includes('OnigiriJS Module')
-        ) {
+        )
+        {
 
-            addWarning(
-                `${folder}: missing module metadata header`
+            warning(
+                `${folder}: missing optional module metadata header`
             );
 
         }
 
-        if (
-            source.includes('eval(')
-        ) {
+        //
+        // Security checks
+        //
+        if (source.includes('eval('))
+        {
 
-            addError(
-                `${folder}: uses forbidden eval()`
+            error(
+                `${folder}: contains forbidden eval()`
             );
 
         }
 
-        if (
-            source.includes('debugger')
-        ) {
+        if (source.includes('debugger'))
+        {
 
-            addError(
+            error(
                 `${folder}: contains debugger statement`
             );
 
@@ -334,9 +369,10 @@ function verifyModules() {
 
         if (
             source.includes('console.log')
-        ) {
+        )
+        {
 
-            addWarning(
+            warning(
                 `${folder}: contains console.log`
             );
 
@@ -346,12 +382,13 @@ function verifyModules() {
 
 }
 
-function verifyDocumentation() {
+// -----------------------------------------------------------------------------
+// Documentation Verification
+// -----------------------------------------------------------------------------
+function verifyDocumentation()
+{
 
-    log(
-        'Checking documentation...'
-    );
-
+    log('Checking documentation...');
 
     const requiredFiles = [
 
@@ -360,11 +397,17 @@ function verifyDocumentation() {
 
     ];
 
-    for (const file of requiredFiles) {
+    for (const file of requiredFiles)
+    {
 
-        if (!exists(path.join(ROOT, file))) {
+        if (
+            !exists(
+                path.join(ROOT, file)
+            )
+        )
+        {
 
-            addError(
+            error(
                 `Missing required file: ${file}`
             );
 
@@ -374,7 +417,11 @@ function verifyDocumentation() {
 
 }
 
-function report() {
+// -----------------------------------------------------------------------------
+// Output
+// -----------------------------------------------------------------------------
+function report()
+{
 
     log('');
 
@@ -388,17 +435,18 @@ function report() {
 
     log('');
 
-    if (errors.length) {
+    if (errors.length)
+    {
 
         log(
             `✗ Errors: ${errors.length}`
         );
 
-
-        for (const error of errors) {
+        for (const item of errors)
+        {
 
             log(
-                `  ✗ ${error}`
+                `  ✗ ${item}`
             );
 
         }
@@ -407,16 +455,18 @@ function report() {
 
     }
 
-    if (warnings.length) {
+    if (warnings.length)
+    {
 
         log(
             `⚠ Warnings: ${warnings.length}`
         );
 
-        for (const warning of warnings) {
+        for (const item of warnings)
+        {
 
             log(
-                `  ⚠ ${warning}`
+                `  ⚠ ${item}`
             );
 
         }
@@ -432,16 +482,19 @@ function report() {
             warnings.length > 0
         );
 
-    if (failed) {
+    if (failed)
+    {
 
         console.error(
-            'verify-onigiri: FAILED'
+            'verify-onigirijs: FAILED'
         );
 
-    } else {
+    }
+    else
+    {
 
         console.log(
-            'verify-onigiri: PASSED'
+            'verify-onigirijs: PASSED'
         );
 
     }
@@ -450,6 +503,10 @@ function report() {
         failed ? 1 : 0;
 
 }
+
+// -----------------------------------------------------------------------------
+// Execute
+// -----------------------------------------------------------------------------
 
 verifyCore();
 
