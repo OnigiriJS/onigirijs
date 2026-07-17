@@ -1,0 +1,45 @@
+name: Verify OnigiriJS Framework
+
+on:
+  push:
+    paths:
+      - 'framework/**/*.js'
+      - 'scripts/verify-onigiri.js'
+      - '.github/workflows/verify-onigirijs.yml'
+
+  pull_request:
+    paths:
+      - 'framework/**/*.js'
+      - 'scripts/verify-onigiri.js'
+      - '.github/workflows/verify-onigirijs.yml'
+
+  workflow_dispatch:
+
+jobs:
+
+  verify:
+
+    name: Verify OnigiriJS framework standards
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+
+      - name: Verify OnigiriJS core and modules
+        run: node scripts/verify-onigiri.js
+
+      # Uncomment this to fail builds on warnings
+      # Examples:
+      # - console.log usage
+      # - missing module metadata headers
+      #
+      # - name: Verify OnigiriJS (strict)
+      #   run: node scripts/verify-onigiri.js --strict
