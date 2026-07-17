@@ -3,13 +3,13 @@ name: Verify OnigiriJS Framework
 on:
   push:
     paths:
-      - 'framework/**/*.js'
+      - 'src/framework/**/*.js'
       - 'scripts/verify-onigiri.js'
       - '.github/workflows/verify-onigirijs.yml'
 
   pull_request:
     paths:
-      - 'framework/**/*.js'
+      - 'src/framework/**/*.js'
       - 'scripts/verify-onigiri.js'
       - '.github/workflows/verify-onigirijs.yml'
 
@@ -36,7 +36,7 @@ jobs:
       - name: Verify OnigiriJS core and modules
         run: node scripts/verify-onigiri.js
 
-      # Uncomment this to fail builds on warnings
+      # Uncomment to also fail on warnings
       # Examples:
       # - console.log usage
       # - missing module metadata headers
