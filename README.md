@@ -61,10 +61,10 @@ A full demos showcasing components, animations, storage, security, and validatio
 ## 🛣 Roadmap
 
 - [ ] 📦 npm package (?)
-- [ ] 🧪 Test suite
+- [x] 🧪 Test suite
 - [x] 📘 API reference docs
 - [x] 🔌 Plugin system
-- [ ] ⚡ Performance optimizations
+- [x] ⚡ Performance optimizations
 
 ## 🤝 Contributing
 
