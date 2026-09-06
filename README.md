@@ -12,6 +12,7 @@ It provides a modern, dependency-free alternative to heavy frameworks while rema
 - 🧠 **Computed properties & watchers**
 - 🔐 **Security helpers** (CSRF, token handling)
 - 🔄 **AJAX utilities** with auto-CSRF injection
+- 📡 **Realtime SSE communication** with automatic reconnection
 - 💾 **Storage helpers** (local/session storage)
 - 🧩 **Event system**
 - ✅ **Form validation**
@@ -21,16 +22,28 @@ It provides a modern, dependency-free alternative to heavy frameworks while rema
 
 No build step required.
 
-## 📦 Installation (CDN)
+## 📦 Installation
 
-OnigiriJS is currently distributed via **jsDelivr**.  
+### npm
+
+Install OnigiriJS using npm:
+
+```bash
+npm install @onigirijs/onigirijs
+```
+
+📦 [View OnigiriJS on npm](https://www.npmjs.com/package/@onigirijs/onigirijs)
+
+### CDN
+
+OnigiriJS is currently distributed via **jsDelivr**.
 You can include individual modules as needed.
 
 ### Core (required)
 
 ```html
 <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/core/onigiri-core.js"></script>
-````
+```
 
 ### Optional Modules
 
@@ -48,23 +61,24 @@ You can include individual modules as needed.
 <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/emojis/onigiri-emojis.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/portal/onigiri-portal.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/router/onigiri-router.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/OnigiriJS/onigirijs@main/src/framework/realtime/onigiri-realtime.js"></script>
 ```
 
 > ℹ️ Load order matters — always load `onigiri-core.js` first.
 
 ## 🧪 Demo
 
-A full demos showcasing components, animations, storage, security, and validation is available at:
+A full demo showcasing components, animations, storage, security, and validation is available at:
 
 👉 [OnigiriJS Shop Demo](https://onigirijs.com/shop/)
 
 ## 🛣 Roadmap
 
-- [ ] 📦 npm package (?)
-- [x] 🧪 Test suite
-- [x] 📘 API reference docs
-- [x] 🔌 Plugin system
-- [x] ⚡ Performance optimizations
+* [x] 📦 npm package
+* [x] 🧪 Test suite
+* [x] 📘 API reference docs
+* [x] 🔌 Plugin system
+* [x] ⚡ Performance optimizations
 
 ## 🤝 Contributing
 
@@ -78,6 +92,6 @@ Contributions, bug reports, and feature requests are welcome.
 
 BSD-3-Clause license © OnigiriJS Framework
 
-___
+---
 
 Built with simplicity in mind — just like a good onigiri 🍙
