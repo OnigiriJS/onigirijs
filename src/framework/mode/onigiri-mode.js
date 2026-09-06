@@ -31,6 +31,8 @@
         throw new Error('OnigiriJS core not found. Load onigiri.core.js first.');
     }
 
+    // OnigiriJS Module: mode
+
     /**
      * Theme Mode Module - Light/Dark mode management
      */
@@ -81,7 +83,10 @@
          * Initialize theme mode system
          */
         init: function(options) {
-            Onigiri.extend(this._config, options || {});
+            // Deep merge: `_config` carries nested objects (classes.light/
+            // classes.dark, selectors, themes) - a shallow merge would let
+            // `init({classes:{light:{...}}})` silently wipe out `dark`.
+            Onigiri.deepExtend(this._config, options || {});
 
             this._currentMode = this._loadMode();
 

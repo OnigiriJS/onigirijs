@@ -31,15 +31,24 @@
         throw new Error('OnigiriJS core not found. Load onigiri.core.js first.');
     }
 
+    // OnigiriJS Module: events
+
     /**
      * Event System - Advanced event handling with namespacing
+     *
+     * Lives as a static class on Onigiri itself (`Onigiri.EventEmitter`),
+     * not on `Onigiri.prototype` - it isn't behavior of a DOM-wrapping
+     * `$()` instance, and attaching it to the prototype meant every
+     * wrapped element result (`Onigiri('.foo')`) inherited an unrelated
+     * `EventEmitter` constructor as an own-feeling property. Kept as a
+     * deprecated alias below for anyone already relying on the old path.
      */
-    Onigiri.prototype.EventEmitter = function() {
+    Onigiri.EventEmitter = function() {
         this._events = {};
         this._onceEvents = new Set();
     };
 
-    Onigiri.prototype.EventEmitter.prototype = {
+    Onigiri.EventEmitter.prototype = {
         on: function(event, handler, namespace) {
             const key = namespace ? `${event}.${namespace}` : event;
             if (!this._events[key]) {
@@ -98,6 +107,22 @@
             return this;
         }
     };
+
+    /**
+     * Deprecated alias - retained for backwards compatibility with code
+     * written against pre-1.0 builds. Warns once, then delegates.
+     */
+    let warnedDeprecatedEventEmitter = false;
+    Object.defineProperty(Onigiri.prototype, 'EventEmitter', {
+        configurable: true,
+        get: function() {
+            if (!warnedDeprecatedEventEmitter) {
+                warnedDeprecatedEventEmitter = true;
+                console.warn('OnigiriJS: `Onigiri.prototype.EventEmitter` is deprecated, use `Onigiri.EventEmitter` instead.');
+            }
+            return Onigiri.EventEmitter;
+        }
+    });
 
     Onigiri.modules.events = true;
 

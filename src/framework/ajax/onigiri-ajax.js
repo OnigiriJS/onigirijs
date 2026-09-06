@@ -31,6 +31,8 @@
         throw new Error('OnigiriJS core not found. Load onigiri.core.js first.');
     }
 
+    // OnigiriJS Module: ajax
+
     /**
      * AJAX Helper with CSRF Support
      */
@@ -42,13 +44,30 @@
             },
             data: null,
             csrf: true,
+            credentials: 'same-origin',
             timeout: 30000
         };
 
         const config = Onigiri.extend({}, defaults, options);
 
-        // Add CSRF token if security module is loaded
-        if (config.csrf && Onigiri.modules.security && Onigiri.security.getToken()) {
+        // Payload types the browser must serialize itself (it sets its
+        // own Content-Type, including the multipart boundary for
+        // FormData). Forcing 'application/json' on these silently
+        // breaks file uploads and urlencoded submissions.
+        const isSelfDescribingBody = typeof FormData !== 'undefined' && config.data instanceof FormData
+            || typeof URLSearchParams !== 'undefined' && config.data instanceof URLSearchParams
+            || typeof Blob !== 'undefined' && config.data instanceof Blob;
+
+        if (isSelfDescribingBody) {
+            config.headers = Onigiri.extend({}, config.headers);
+            delete config.headers['Content-Type'];
+        }
+
+        // Only attach the CSRF token to same-origin requests. Sending it
+        // to an absolute cross-origin URL would leak it to a third party.
+        const targetIsSameOrigin = !Onigiri.modules.security || Onigiri.security.isSameOrigin(config.url);
+
+        if (config.csrf && targetIsSameOrigin && Onigiri.modules.security && Onigiri.security.getToken()) {
             config.headers = Onigiri.security.addCSRFToHeaders(config.headers);
         }
 
@@ -59,7 +78,10 @@
         return fetch(config.url, {
             method: config.method,
             headers: config.headers,
-            body: config.data ? JSON.stringify(config.data) : null,
+            credentials: config.credentials,
+            body: isSelfDescribingBody
+                ? config.data
+                : (config.data ? JSON.stringify(config.data) : null),
             signal: controller.signal
         }).then(response => {
             clearTimeout(timeoutId);

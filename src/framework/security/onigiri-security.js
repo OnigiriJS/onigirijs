@@ -31,6 +31,8 @@
         throw new Error('OnigiriJS core not found. Load onigiri.core.js first.');
     }
 
+    // OnigiriJS Module: security
+
     /**
      * Security Module - CSRF Protection and CSP Support
      */

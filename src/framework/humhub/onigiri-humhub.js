@@ -31,13 +31,21 @@
         throw new Error('OnigiriJS core not found. Load onigiri.core.js first.');
     }
 
+    // OnigiriJS Module: humhub
+
     /**
      * HumHub Integration Hook
      */
     Onigiri.humhub = function(moduleName, config) {
+        if (!Onigiri.Component) {
+            throw new Error('OnigiriJS HumHub integration requires the Components module. Load onigiri-components.js first.');
+        }
+
+        config = config || {};
+
         if (typeof humhub !== 'undefined' && humhub.module) {
             return humhub.module(moduleName, function(module, require, $) {
-                const component = new Onigiri.prototype.Component(config);
+                const component = Onigiri.Component(config);
                 
                 module.exports = component;
                 
@@ -61,7 +69,7 @@
             });
         } else {
             console.warn('HumHub not detected. Component created without HumHub integration.');
-            return new Onigiri.prototype.Component(config);
+            return Onigiri.Component(config);
         }
     };
 

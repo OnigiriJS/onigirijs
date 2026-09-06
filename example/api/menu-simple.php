@@ -28,7 +28,12 @@
  */
 
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+// This demo is always served same-origin (from example/index.php on the
+// same host), so no CORS header is needed here. A wildcard
+// `Access-Control-Allow-Origin: *` on an endpoint that may later grow to
+// read session/user state is a common way real APIs end up exposing data
+// cross-origin - don't copy that pattern into a real HumHub module
+// without first deciding which origins should actually be allowed.
 
 $menu = [
     ['id' => 1, 'nameKey' => 'menu.salmon.name', 'descKey' => 'menu.salmon.desc', 'price' => 3.50, 'emoji' => '🐟'],

@@ -31,6 +31,8 @@
         throw new Error('OnigiriJS core not found. Load onigiri.core.js first.');
     }
 
+    // OnigiriJS Module: router
+
     /**
      * Router System - Lightweight routing with PJAX support
      */
@@ -279,11 +281,25 @@
                 const link = e.target.closest(this._config.linkSelector);
                 if (!link) return;
 
-                e.preventDefault();
+                // Let the browser handle links that aren't plain in-page
+                // navigations: new tabs/windows, downloads, and
+                // non-http(s) schemes (mailto:, tel:, javascript:, etc.).
+                if (link.target && link.target !== '_self') return;
+                if (link.hasAttribute('download')) return;
+
                 const href = link.getAttribute('href') || link.getAttribute('data-href');
-                if (href) {
-                    this.navigate(href);
+                if (!href || href.startsWith('#')) return;
+
+                // The router pushes to the History API, which throws for
+                // cross-origin URLs - and it should never fetch/inject
+                // content from another origin in the first place.
+                if (Onigiri.modules.security &&
+                    (!Onigiri.security.isValidURL(href) || !Onigiri.security.isSameOrigin(href))) {
+                    return;
                 }
+
+                e.preventDefault();
+                this.navigate(href);
             });
 
             document.addEventListener('submit', (e) => {
@@ -429,7 +445,12 @@
             const newContent = tempDiv.querySelector(this._config.container);
             const content = newContent ? newContent.innerHTML : html;
 
-            if (route.options.transition) {
+            // `route` is null when this is called from _handleFormSubmit()
+            // (a form target isn't necessarily a registered route) -
+            // fall back to the transition default rather than crashing.
+            const useTransition = route ? route.options.transition : true;
+
+            if (useTransition) {
                 container.style.opacity = '0';
                 setTimeout(() => {
                     container.innerHTML = content;
@@ -483,6 +504,13 @@
         _handleFormSubmit: function(form) {
             const action = form.action || window.location.href;
             const method = (form.method || 'GET').toUpperCase();
+
+            if (Onigiri.modules.security && !Onigiri.security.isSameOrigin(action)) {
+                console.warn('OnigiriJS Router: Refusing to intercept cross-origin form submission, falling back to native submit:', action);
+                form.submit();
+                return;
+            }
+
             const formData = new FormData(form);
 
             if (this._config.csrf && Onigiri.modules.security && Onigiri.security.getToken()) {
@@ -502,7 +530,8 @@
 
             const fetchOptions = {
                 method: method,
-                headers: {}
+                headers: {},
+                credentials: 'same-origin'
             };
 
             if (this._config.csrf && Onigiri.modules.security && Onigiri.security.getToken()) {
@@ -534,6 +563,7 @@
          */
         _fetchPage: function(path) {
             const fetchOptions = {
+                credentials: 'same-origin',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }

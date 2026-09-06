@@ -31,6 +31,8 @@
         throw new Error('OnigiriJS core not found. Load onigiri.core.js first.');
     }
 
+    // OnigiriJS Module: translation
+
     /**
      * Translation Module
      */
@@ -506,7 +508,7 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            console.log(`OnigiriJS i18n: Downloaded translation/${locale}/${filename}`);
+            console.debug(`OnigiriJS i18n: Downloaded translation/${locale}/${filename}`);
             return true;
         },
 
@@ -532,7 +534,7 @@
                 })
                 .then(success => {
                     if (success) {
-                        console.log(`OnigiriJS i18n: Loaded translations from ${url}`);
+                        console.debug(`OnigiriJS i18n: Loaded translations from ${url}`);
                         document.dispatchEvent(new CustomEvent('onigiri:translations:loaded', {
                             detail: { url, locale, namespace }
                         }));
@@ -575,7 +577,7 @@
             return Promise.all(promises)
                 .then(results => {
                     const successful = results.filter(r => r).length;
-                    console.log(`OnigiriJS i18n: Loaded ${successful}/${results.length} translation files`);
+                    console.debug(`OnigiriJS i18n: Loaded ${successful}/${results.length} translation files`);
                     return results;
                 });
         }

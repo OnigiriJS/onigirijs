@@ -31,6 +31,8 @@
         throw new Error('OnigiriJS core not found. Load onigiri-core.js first.');
     }
 
+    // OnigiriJS Module: animate
+
     /**
      * Easing Functions Library
      */

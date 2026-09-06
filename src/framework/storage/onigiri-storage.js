@@ -31,12 +31,19 @@
         throw new Error('OnigiriJS core not found. Load onigiri.core.js first.');
     }
 
+    // OnigiriJS Module: storage
+
     /**
      * Local Storage Manager
+     *
+     * NOTE: localStorage/sessionStorage are plain text and readable by
+     * any script running on the page (including via XSS). Do not use
+     * this module to store CSRF tokens, session identifiers, auth
+     * tokens, or other secrets - onigiri-security.js's meta-tag based
+     * token handling exists precisely to avoid that.
      */
     Onigiri.storage = {
         _prefix: 'onigiri_',
-        _encrypted: false,
 
         setPrefix: function(prefix) {
             this._prefix = prefix;

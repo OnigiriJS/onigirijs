@@ -43,10 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $locale = filter_input(INPUT_POST, 'locale', FILTER_SANITIZE_STRING);
+    // FILTER_SANITIZE_STRING was deprecated in PHP 8.1 and removed in
+    // PHP 9.0. A plain trim() is enough here since the value is only
+    // ever accepted against the strict whitelist below.
+    $locale = trim($_POST['locale'] ?? '');
 
     $allowedLocales = ['en', 'es', 'fr', 'ja'];
-    if (!in_array($locale, $allowedLocales)) {
+    if (!in_array($locale, $allowedLocales, true)) {
         http_response_code(400);
         echo json_encode(['error' => 'Invalid locale']);
         exit;
