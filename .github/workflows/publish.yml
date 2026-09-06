@@ -5,7 +5,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   publish:
@@ -21,9 +20,12 @@ jobs:
         with:
           node-version: 26
           registry-url: https://registry.npmjs.org
+          package-manager-cache: false
 
-      - name: Check package
+      - name: Check package contents
         run: npm pack --dry-run
 
       - name: Publish to npm
         run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
