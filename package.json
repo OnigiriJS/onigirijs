@@ -1,5 +1,5 @@
 {
-    "name": "onigirijs",
+    "name": "@onigirijs/onigirijs",
     "version": "1.0.0",
     "description": "A lightweight, modular JavaScript framework for building reactive UI components and HumHub integrations.",
     "license": "BSD-3-Clause",
