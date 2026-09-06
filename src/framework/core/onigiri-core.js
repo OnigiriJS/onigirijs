@@ -313,6 +313,12 @@
     /**
      * Utility Methods
      */
+
+    // Keys that must never be copied during a merge - blocks prototype
+    // pollution when `source` originates from JSON.parse()'d user/server
+    // input (e.g. `{"__proto__":{"polluted":true}}`).
+    const UNSAFE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+
     Onigiri.extend = function(target, ...sources) {
 
         // Ensure target is always a valid object
@@ -328,7 +334,46 @@
             }
 
             Object.keys(source).forEach(key => {
+                if (UNSAFE_KEYS.has(key)) {
+                    return;
+                }
+
                 target[key] = source[key];
+            });
+        });
+
+        return target;
+    };
+
+    /**
+     * Recursive version of extend() - merges nested plain objects instead
+     * of replacing them wholesale. Use this for config objects that carry
+     * nested structures (e.g. theme/class maps) so a partial override
+     * doesn't wipe out sibling keys. Arrays and non-plain objects
+     * (DOM nodes, class instances, etc.) are replaced, not merged.
+     */
+    Onigiri.deepExtend = function(target, ...sources) {
+        if (target == null || typeof target !== 'object') {
+            target = {};
+        }
+
+        sources.forEach(source => {
+            if (source == null || typeof source !== 'object') {
+                return;
+            }
+
+            Object.keys(source).forEach(key => {
+                if (UNSAFE_KEYS.has(key)) {
+                    return;
+                }
+
+                const value = source[key];
+
+                if (Onigiri.isObject(value) && Onigiri.isObject(target[key])) {
+                    target[key] = Onigiri.deepExtend({}, target[key], value);
+                } else {
+                    target[key] = value;
+                }
             });
         });
 
@@ -428,8 +473,30 @@
     /**
      * Export to global scope
      */
+    const previousOnigiri = global.Onigiri;
+    const previousO = global.O;
+
     global.Onigiri = Onigiri;
     global.O = Onigiri;
+
+    /**
+     * Restore whatever previously occupied `window.Onigiri` / `window.O`
+     * (e.g. another library also using the short `O` alias) and return
+     * this Onigiri reference so it can be reassigned to a custom name.
+     * Improves compatibility when embedding inside HumHub alongside
+     * other jQuery-alike globals.
+     */
+    Onigiri.noConflict = function(alsoRestoreShortAlias) {
+        if (global.Onigiri === Onigiri) {
+            global.Onigiri = previousOnigiri;
+        }
+
+        if (alsoRestoreShortAlias !== false && global.O === Onigiri) {
+            global.O = previousO;
+        }
+
+        return Onigiri;
+    };
 
     /**
      * AMD support

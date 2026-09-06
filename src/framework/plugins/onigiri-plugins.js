@@ -31,6 +31,8 @@
         throw new Error('OnigiriJS core not found. Load onigiri.core.js first.');
     }
 
+    // OnigiriJS Module: plugins
+
     /**
      * Plugin Registry
      */
@@ -115,6 +117,16 @@
         version: '1.0.0',
 
         install: function(Onigiri, options) {
+            // The dedicated onigiri-storage.js module already provides a
+            // richer `Onigiri.storage` (expiry, local+session namespaces,
+            // getAll/size). Installing this legacy plugin on top of it
+            // used to silently replace that API with this simpler one -
+            // refuse instead, so load order can no longer change behavior.
+            if (Onigiri.modules.storage) {
+                console.warn('OnigiriJS: Skipping "storage" plugin - onigiri-storage.js is already loaded and takes precedence.');
+                return;
+            }
+
             const defaults = {
                 type: 'local', // 'local' or 'session'
                 prefix: 'onigiri_',
@@ -197,6 +209,14 @@
         version: '1.0.0',
 
         install: function(Onigiri, options) {
+            // onigiri-router.js provides a full pushState/PJAX-aware
+            // router with a different, incompatible API shape. Never
+            // let this lightweight hash router silently replace it.
+            if (Onigiri.modules.router) {
+                console.warn('OnigiriJS: Skipping "router" plugin - onigiri-router.js is already loaded and takes precedence.');
+                return;
+            }
+
             const defaults = {
                 mode: 'hash', // 'hash' or 'history'
                 root: '/'
@@ -312,6 +332,16 @@
         version: '1.0.0',
 
         install: function(Onigiri) {
+            // onigiri-animate.js defines the same method names
+            // (fadeIn/fadeOut/slideDown/slideUp/animate) with a richer,
+            // incompatible signature (adds an `easing` parameter).
+            // Loading both and installing this plugin used to silently
+            // swap the implementation depending on load order.
+            if (Onigiri.modules.animate) {
+                console.warn('OnigiriJS: Skipping "animation" plugin - onigiri-animate.js is already loaded and takes precedence.');
+                return;
+            }
+
             Onigiri.prototype.fadeIn = function(duration = 300, callback) {
                 this.each(el => {
                     el.style.opacity = '0';
@@ -425,6 +455,14 @@
         version: '1.0.0',
 
         install: function(Onigiri, options) {
+            // onigiri-security.js also covers CSP nonces, HTML escaping
+            // and origin validation, none of which this legacy plugin
+            // provides. Never let it silently replace the fuller module.
+            if (Onigiri.modules.security) {
+                console.warn('OnigiriJS: Skipping "security" plugin - onigiri-security.js is already loaded and takes precedence.');
+                return;
+            }
+
             const defaults = {
                 tokenName: 'csrf_token',
                 headerName: 'X-CSRF-Token',
@@ -498,7 +536,10 @@
                     const defaults = {
                         path: '/',
                         expires: null, // days
-                        secure: false,
+                        // Default to the page's own scheme instead of a
+                        // hardcoded `false`, so cookies aren't set without
+                        // the Secure flag on an https:// page by default.
+                        secure: window.location.protocol === 'https:',
                         sameSite: 'Lax'
                     };
 

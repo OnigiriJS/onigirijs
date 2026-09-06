@@ -27,6 +27,11 @@
  * ===============================================================
  */
 
+// verifyCsrf() below reads $_SESSION['csrf_token'], so the session must be
+// started first - without this the comparison is always against an empty
+// value and every legitimate request gets rejected as a CSRF mismatch.
+session_start();
+
 header('Content-Type: application/json');
 
 $locale = $_SESSION['locale'] ?? 'en';
@@ -69,6 +74,17 @@ function verifyCsrf() {
     return hash_equals($_SESSION['csrf_token'] ?? '', $token);
 }
 
+/**
+ * FILTER_SANITIZE_STRING was deprecated in PHP 8.1 and removed in PHP 9.0.
+ * This trims the value and HTML-encodes it, which is what that filter was
+ * commonly (mis)used for. Note this only makes a value safe to echo back
+ * into HTML - it does not replace proper output-context escaping wherever
+ * this value is later rendered.
+ */
+function sanitizeInput(?string $value): string {
+    return htmlspecialchars(trim($value ?? ''), ENT_QUOTES, 'UTF-8');
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verifyCsrf()) {
         http_response_code(403);
@@ -76,10 +92,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
+    $name = sanitizeInput($_POST['name'] ?? null);
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-    $phone = filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_STRING);
-    $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
+    $phone = sanitizeInput($_POST['phone'] ?? null);
+    $message = sanitizeInput($_POST['message'] ?? null);
 
     if (empty($name) || empty($email) || empty($message)) {
         http_response_code(400);

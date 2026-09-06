@@ -31,6 +31,8 @@
         throw new Error('OnigiriJS core not found. Load onigiri.core.js first.');
     }
 
+    // OnigiriJS Module: pjax
+
     /**
      * PJAX Support with CSRF Protection
      */
@@ -97,6 +99,17 @@
                 console.error('OnigiriJS PJAX: Container not found');
                 window.location = url;
                 return;
+            }
+
+            // PJAX is for in-page navigation of same-origin content only.
+            // A cross-origin URL (e.g. from a malformed data-pjax href)
+            // must not be fetched via XHR and injected into the DOM, and
+            // must never receive the CSRF token - fall back to a normal
+            // full-page navigation instead.
+            if (Onigiri.modules.security && !Onigiri.security.isSameOrigin(url)) {
+                console.warn('OnigiriJS PJAX: Refusing to load cross-origin URL, falling back to full navigation:', url);
+                window.location = url;
+                return Promise.reject(new Error('PJAX: cross-origin URL rejected'));
             }
 
             if (this._currentXhr) {
@@ -223,17 +236,7 @@
 
         submit: function(form, options) {
             options = Onigiri.extend({}, this._config, options || {});
-            
-            const formData = new FormData(form);
-            
-            // Add CSRF token if security module is loaded
-            if (options.csrf && Onigiri.modules.security && Onigiri.security.getToken()) {
-                formData.append(
-                    Onigiri.security._config.csrfParam,
-                    Onigiri.security.getToken()
-                );
-            }
-            
+
             const method = (form.method || 'POST').toUpperCase();
             const url = form.action || window.location.href;
             const container = document.querySelector(options.container || '#pjax-container');
@@ -241,6 +244,22 @@
             if (!container) {
                 form.submit();
                 return;
+            }
+
+            if (Onigiri.modules.security && !Onigiri.security.isSameOrigin(url)) {
+                console.warn('OnigiriJS PJAX: Refusing to intercept cross-origin form submission, falling back to native submit:', url);
+                form.submit();
+                return;
+            }
+
+            const formData = new FormData(form);
+
+            // Add CSRF token if security module is loaded
+            if (options.csrf && Onigiri.modules.security && Onigiri.security.getToken()) {
+                formData.append(
+                    Onigiri.security._config.csrfParam,
+                    Onigiri.security.getToken()
+                );
             }
 
             container.classList.add('pjax-loading');

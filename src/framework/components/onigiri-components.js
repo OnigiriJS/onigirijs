@@ -31,11 +31,21 @@
         throw new Error('OnigiriJS core not found. Load onigiri.core.js first.');
     }
 
+    // OnigiriJS Module: components
+
+    if (!Onigiri.EventEmitter) {
+        throw new Error('OnigiriJS Components module requires the Events module. Load onigiri-events.js before onigiri-components.js.');
+    }
+
     /**
      * Advanced Object Prototyping System
+     *
+     * Static factory on Onigiri (`Onigiri.Component`), matching
+     * `Onigiri.EventEmitter` - not attached to `Onigiri.prototype`,
+     * which would leak it onto every `$()`-wrapped element result.
      */
-    Onigiri.prototype.Component = function(config) {
-        const component = Object.create(new Onigiri.prototype.EventEmitter());
+    Onigiri.Component = function(config) {
+        const component = Object.create(new Onigiri.EventEmitter());
         
         component._data = config.data || {};
         component._methods = config.methods || {};
@@ -145,6 +155,21 @@
 
         return component;
     };
+
+    /**
+     * Deprecated alias - see onigiri-events.js for rationale.
+     */
+    let warnedDeprecatedComponent = false;
+    Object.defineProperty(Onigiri.prototype, 'Component', {
+        configurable: true,
+        get: function() {
+            if (!warnedDeprecatedComponent) {
+                warnedDeprecatedComponent = true;
+                console.warn('OnigiriJS: `Onigiri.prototype.Component` is deprecated, use `Onigiri.Component` instead.');
+            }
+            return Onigiri.Component;
+        }
+    });
 
     Onigiri.modules.components = true;
 

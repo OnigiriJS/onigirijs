@@ -27,11 +27,24 @@
  * ===============================================================
  */
 
+// This endpoint reads/writes $_SESSION, so the session must be started
+// before touching $_SESSION - without this, `$_SESSION['locale'] = ...`
+// below never actually persists across requests and silently does nothing.
+session_start();
+
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+// Same-origin demo - see menu-simple.php for why this intentionally has
+// no `Access-Control-Allow-Origin: *`, especially since this endpoint
+// touches session state.
 
 try {
     $locale = $_GET['locale'] ?? $_SESSION['locale'] ?? 'en';
+
+    $allowedLocales = ['en', 'es', 'fr', 'ja'];
+    if (!in_array($locale, $allowedLocales, true)) {
+        $locale = 'en';
+    }
+
     $_SESSION['locale'] = $locale;
 
     $menu = [
@@ -86,9 +99,12 @@ try {
     ]);
 
 } catch (Exception $e) {
+    // Log the real error server-side, but never echo exception details
+    // back to the client - messages/stack traces can leak file paths,
+    // query fragments, or other internals to whoever calls this endpoint.
+    error_log('OnigiriJS demo menu.php error: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode([
-        'error' => 'Server error',
-        'message' => $e->getMessage()
+        'error' => 'Server error'
     ]);
 }
