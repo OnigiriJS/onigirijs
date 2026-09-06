@@ -1,0 +1,27 @@
+{
+    "name": "onigirijs",
+    "version": "1.0.0",
+    "description": "A lightweight, modular JavaScript framework for building reactive UI components and HumHub integrations.",
+    "license": "BSD-3-Clause",
+    "author": "OnigiriJS Framework",
+    "homepage": "https://onigirijs.com/",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/OnigiriJS/onigirijs.git"
+    },
+    "bugs": {
+        "url": "https://github.com/OnigiriJS/onigirijs/issues"
+    },
+    "keywords": [
+        "javascript",
+        "framework",
+        "humhub",
+        "reactive",
+        "components",
+        "onigirijs"
+    ],
+    "files": [
+        "src/framework"
+    ],
+    "main": "src/framework/core/onigiri-core.js"
+}
